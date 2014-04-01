@@ -7,7 +7,6 @@ public class GPGGui : MonoBehaviour {
 	
 	private enum GPLoginState {loggedout, loggedin};
 	private GPLoginState m_loginState = GPLoginState.loggedout;
-	bool needFullSignin = false;
 	private string dataToSave = "Hello World";
 
     private string testLeaderBoard = "< GPG Leaderboard ID >";
@@ -36,51 +35,41 @@ public class GPGGui : MonoBehaviour {
 		
 		if(GUILayout.Button("SignIn", GUILayout.Height(120))) {
 			Debug.Log("Signin called");
-			//needFullSignin = !NerdGPG.GPG_TrySilentSignIn();
-			//NerdGPG.Instance().signIn();
 
             Social.localUser.Authenticate(OnAuthCB);
 		}
-		/*
-		if(needFullSignin) {
-			if(GUILayout.Button("SignIn", GUILayout.Height(60))) {
-				Debug.Log("Signin called");
-				NerdGPG.GPG_SignIn();
-			}
-		}*/
+	
 		if(m_loginState == GPLoginState.loggedin) {
             if (GUILayout.Button("SignOut", GUILayout.Height(120))) {
-				//NerdGPG.GPG_SignOut();
+
 				NerdGPG.Instance().signOut();
+
 			}
 		}
+
 		GUILayout.EndHorizontal();
 		
 		GUILayout.BeginHorizontal();
 		if(Social.localUser.authenticated) {
 			// we are logged in. we can do leaderboard and achievement and cloud stuff
             if (GUILayout.Button("GPG_ShowAllLeaderBoards", GUILayout.Height(120))) {
-				//NerdGPG.GPG_ShowAllLeaderBoards();
-				//NerdGPG.Instance().showAllLeaderBoards();
-				//NerdGPG.Instance().loadAchievements(true);
+			
                 Social.ShowLeaderboardUI();
 			}
             if (GUILayout.Button("GPG_ShowLeaderBoards", GUILayout.Height(120))) {
-				//NerdGPG.GPG_ShowLeaderBoards(testLeaderBoard);
+
 				NerdGPG.Instance().showLeaderBoards(testLeaderBoard);
 			}
 
             if (GUILayout.Button("GPG_SubmitScore", GUILayout.Height(120))) {
-			//	NerdGPG.GPG_SubmitScore(testLeaderBoard,80);
-				//NerdGPG.Instance().submitScore(testLeaderBoard,80, null);
+			
                 Social.ReportScore(80, testLeaderBoard, OnSubmitScore);
 			}
 
             GUILayout.EndHorizontal();
             GUILayout.BeginHorizontal();
             if (GUILayout.Button("GPG_ShowAchievements", GUILayout.Height(120))) {
-                //	NerdGPG.GPG_ShowAchievements();
-                //NerdGPG.Instance().showAchievements();
+          
                 Social.ShowAchievementsUI();
             }
 
@@ -131,16 +120,14 @@ public class GPGGui : MonoBehaviour {
 				byte[] bytes = new byte[dataToSave.Length * sizeof(char)];
     			System.Buffer.BlockCopy(dataToSave.ToCharArray(), 0, bytes, 0, bytes.Length);
 				NerdGPG.Instance().saveToCloud(0,bytes);
-			//	NerdGPG.GPG_SaveToCloud(0,bytes,bytes.Length);
+			
 			}
             if (GUILayout.Button("GPG_LoadFromCloud", GUILayout.Height(120))) {
 				
 				Debug.Log("Loading from cloud for key 0");
-//				NerdGPG.GPG_LoadFromCloud(0,bytes,bytes.Length);
+
 				NerdGPG.Instance().loadFromCloud(0, OnGPGCloudLoadResult);
-//				GCHandle handle = GCHandle.Alloc(key0CloudData,GCHandleType.Pinned);
-			//	NerdGPG.GPG_LoadFromCloud(0,handle.AddrOfPinnedObject(),key0CloudData.Length);
-				//handle.Free();
+
 			}
 		}
 		GUILayout.EndHorizontal();
@@ -190,7 +177,7 @@ public class GPGGui : MonoBehaviour {
 
 	public void GPGAuthResult(string result)
 	{
-		// success/failed
+		// Success/failed
 		if(result == "success") {
 			m_loginState = GPLoginState.loggedin;
 		} else 
