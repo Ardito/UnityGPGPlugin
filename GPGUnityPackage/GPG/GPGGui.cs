@@ -137,7 +137,7 @@ public class GPGGui : MonoBehaviour {
 				
 				Debug.Log("Loading from cloud for key 0");
 //				NerdGPG.GPG_LoadFromCloud(0,bytes,bytes.Length);
-				NerdGPG.Instance().loadFromCloud(0);
+				NerdGPG.Instance().loadFromCloud(0, OnGPGCloudLoadResult);
 //				GCHandle handle = GCHandle.Alloc(key0CloudData,GCHandleType.Pinned);
 			//	NerdGPG.GPG_LoadFromCloud(0,handle.AddrOfPinnedObject(),key0CloudData.Length);
 				//handle.Free();

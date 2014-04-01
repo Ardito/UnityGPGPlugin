@@ -8,7 +8,7 @@ using UnityEngine.SocialPlatforms;
 
 public class NerdGPG : MonoBehaviour {
 
-    public const string appID = "< GPG app id >";
+	public const string appID = "<GPG app id>";
 
     public struct ExtraACData
     {
@@ -35,6 +35,7 @@ public class NerdGPG : MonoBehaviour {
     private Action<bool> CBOnAuth = null;
     private Action<bool> CBSubmitScore = null;
     private Action<bool> CBUnlockAchievement = null;
+	private Action<string> CBOnCloudLoad = null;
 
     private Action onACLoadCB;
 
@@ -81,6 +82,7 @@ public class NerdGPG : MonoBehaviour {
 		else 
 			return false;
 #endif
+		return false;
 	}
 	
 	public bool signIn(Action<bool> cb) {
@@ -100,6 +102,7 @@ public class NerdGPG : MonoBehaviour {
         CBOnAuth = cb;
 		return mNerdGPG.Call<bool>("signIn");
 #endif // UNITY_ANDROID
+		return false;
 	}
 	
 	public void signOut() {
@@ -149,6 +152,7 @@ public class NerdGPG : MonoBehaviour {
 #elif UNITY_ANDROID
 		return mNerdGPG.Call<bool>("hasAuthorised");
 #endif 
+		return false;
 	}
 	public void setGameObjectName(string gameObjectName) {
 #if UNITY_IPHONE
@@ -166,6 +170,7 @@ public class NerdGPG : MonoBehaviour {
 #elif UNITY_ANDROID
         return mNerdGPG.Call<string>("getPlayerName");
 #endif
+		return "";
     }
 
     public string getPlayerID()
@@ -176,6 +181,7 @@ public class NerdGPG : MonoBehaviour {
 #elif UNITY_ANDROID
         return mNerdGPG.Call<string>("getPlayerID");
 #endif
+		return "";
     }
 	
 	public void unlockAchievement(string achievementId, Action<bool> cb) {
@@ -203,6 +209,7 @@ public class NerdGPG : MonoBehaviour {
 		mNerdGPG.Call("loadAchievements",bForceReload);
         return true;
 #endif
+		return false;
 	}
 	
 	public void incrementAchievement(string achievementId, int numSteps, Action<bool> cb) {
@@ -244,8 +251,9 @@ public class NerdGPG : MonoBehaviour {
 #endif
 	}
 	
-	public void loadFromCloud(int keyNum)
+	public void loadFromCloud(int keyNum, Action<string> onLoad)
 	{
+		CBOnCloudLoad = onLoad;
 #if UNITY_IPHONE
 		try {
 			switch(keyNum) {
@@ -333,6 +341,7 @@ public class NerdGPG : MonoBehaviour {
 		Debug.LogError("Empty data received from cloud???");
 		return null; // nothing received.
 #endif 
+		return null;
 	}
 	
 
@@ -363,8 +372,13 @@ public class NerdGPG : MonoBehaviour {
         if (resArr.Length < 3) {
             Debug.LogError("Length of array after split is less than 3");
             return; // weird stuff
-        }
+		}
         int keyNum = System.Convert.ToInt16(resArr[1]);
+
+		if(CBOnCloudLoad != null) {
+			CBOnCloudLoad(result);
+		}
+
         /*if (resArr[0] == "success") {
             // lets see what our data holds.
             byte[] data = NerdGPG.Instance().getKeyLoadedData(keyNum);
